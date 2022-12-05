@@ -8,7 +8,7 @@ provider "google-beta" {
 }
 
 resource "google_folder" "default" {
-  display_name = "shared-vpc-fw-app-${var.timestamp}"
+  display_name = "shared-vpc-nva-${var.timestamp}"
   parent       = var.parent_org
 }
 

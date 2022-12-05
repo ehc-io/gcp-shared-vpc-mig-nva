@@ -87,3 +87,30 @@ resource "google_compute_firewall" "allow-north-south" {
         ports    = ["80"]
     }
 }
+
+resource "google_compute_firewall" "allow-nva-hc-shared-vpc" {
+    project       = module.host_project.name
+    name          = "allow-nva-hc-shared-vpc"
+    provider      = google-beta
+    direction     = "INGRESS"
+    network       = google_compute_network.vpc_shared.id
+    source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
+    target_tags =  [ "fw" ]
+    allow {
+        protocol = "tcp"
+        ports    = ["80"]
+    }
+}
+resource "google_compute_firewall" "allow-nva-hc-multi-tenant-vpc" {
+    project       = module.host_project.name
+    name          = "allow-nva-hc-multi-tenant-vpc"
+    provider      = google-beta
+    direction     = "INGRESS"
+    network       = google_compute_network.vpc_multi_tenant.id
+    source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
+    target_tags =  [ "fw" ]
+    allow {
+        protocol = "tcp"
+        ports    = ["80"]
+    }
+}
