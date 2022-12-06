@@ -43,44 +43,43 @@ resource "google_compute_instance" "jumphost" {
   }
 }
 # instance client-a
-# resource "google_compute_instance" "client-a" {
-#     project      = module.host_project.name
-#     name         = "client-a"
-#     machine_type = "e2-micro"
-#     zone         = var.zone_1
-#     tags = [ "ssh-mgmt" , "north-south"]
+resource "google_compute_instance" "client-a" {
+    project      = module.host_project.name
+    name         = "client-a"
+    machine_type = "e2-micro"
+    zone         = var.zone_1
+    tags = [ "ssh-mgmt" , "north-south"]
 
-#     boot_disk {
-#         initialize_params {
-#         image = "ubuntu-os-cloud/ubuntu-2004-lts"
-#         }
-#     }
+    boot_disk {
+        initialize_params {
+        image = "ubuntu-os-cloud/ubuntu-2004-lts"
+        }
+    }
 
-#     shielded_instance_config {
-#         enable_secure_boot = true
-#         enable_vtpm = true
-#         enable_integrity_monitoring = true
-#     }
+    shielded_instance_config {
+        enable_secure_boot = true
+        enable_vtpm = true
+        enable_integrity_monitoring = true
+    }
 
-#     metadata = {
-#         startup-script = <<EOT
-#         #!/bin/bash
-#         apt update -y
-#         apt install -y net-tools traceroute
-#         EOT
-#     }
+    metadata = {
+        startup-script = <<EOT
+        #!/bin/bash
+        apt update -y
+        apt install -y net-tools traceroute
+        EOT
+    }
 
-#     network_interface {
-#         subnetwork = google_compute_subnetwork.subnet-a.self_link
-#         network_ip = "192.168.10.20"
-#     }
+    network_interface {
+        subnetwork = google_compute_subnetwork.subnet-a.self_link
+        # network_ip = "192.168.10.20"
+    }
 
-#   service_account {
-#     email  =  module.host_project.service_accounts.default.compute
-#     scopes = ["cloud-platform"]
-#   }
-# }
-#
+  service_account {
+    email  =  module.host_project.service_accounts.default.compute
+    scopes = ["cloud-platform"]
+  }
+}
 # instance svc-c
 resource "google_compute_instance" "nginx-c" {
     project      = module.service_project_c.name
@@ -108,6 +107,10 @@ resource "google_compute_instance" "nginx-c" {
         #!/bin/bash
         apt update -y
         apt install -y nginx net-tools traceroute
+        # web server config
+        sudo sed -i 's/listen 80/listen 8081/' /etc/nginx/sites-enabled/default
+        hostname=$(hostname)
+        echo "<html><h1>Hello World</h1><h2>server: $hostname</h2></html>" > /var/www/html/index.html
         EOT
     }
 
@@ -124,9 +127,9 @@ resource "google_compute_instance" "nginx-c" {
     email  =  module.service_project_c.service_accounts.default.compute
     scopes = ["cloud-platform"]
   }
-#     depends_on = [
-#     google_compute_instance.vm-firewall
-#   ]
+    # depends_on = [
+    #   google_compute_instance_group_manager.mig-nva
+    # ]
 }
 # instance svc-d
 # resource "google_compute_instance" "nginx-d" {
@@ -171,9 +174,9 @@ resource "google_compute_instance" "nginx-c" {
 #     email  =  module.service_project_d.service_accounts.default.compute
 #     scopes = ["cloud-platform"]
 #   }
-# #     depends_on = [
-# #     google_compute_instance.vm-firewall
-# #   ]
+    # depends_on = [
+    #   google_compute_instance_group_manager.mig-nva.id
+    # ]
 # }
 # instance svc-f
 resource "google_compute_instance" "nginx-f" {
@@ -202,6 +205,9 @@ resource "google_compute_instance" "nginx-f" {
         #!/bin/bash
         apt update -y
         apt install -y nginx net-tools traceroute
+        sudo sed -i 's/listen 80/listen 8082/' /etc/nginx/sites-enabled/default
+        hostname=$(hostname)
+        echo "<html>\n<h1>Hello World</h1>\n<h2>server: $hostname</h2>\n</html>" > /var/www/html/index.html
         EOT
     }
 
@@ -218,13 +224,7 @@ resource "google_compute_instance" "nginx-f" {
     email  =  module.service_project_f.service_accounts.default.compute
     scopes = ["cloud-platform"]
   }
-#     depends_on = [
-#     google_compute_instance.vm-firewall
-#   ]
+    # depends_on = [
+    #   google_compute_instance_group_manager.mig-nva
+    # ]
 }
-
-# output "jumphost_int_nic" {
-#     sensitive = true
-#     value = google_compute_instance.jumphost.network_interface[0].network_ip
-#     # network_interface[0].ipv4
-# }

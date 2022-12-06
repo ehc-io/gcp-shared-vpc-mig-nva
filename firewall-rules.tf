@@ -29,6 +29,7 @@ resource "google_compute_firewall" "allow-ssh-vpc-mgmt" {
     ports    = ["22"]
     }
 }
+######################################################################
 # EAST-WEST Traffic
 resource "google_compute_firewall" "allow-east-west-shared" {
     project = module.host_project.name
@@ -69,48 +70,77 @@ resource "google_compute_firewall" "allow-east-west-single-tenant" {
     protocol = "all"
     }
 }
-# NORTH-SOUTH Traffic
-resource "google_compute_firewall" "allow-north-south" {
-    project = module.host_project.name
-    name = "allow-north-south"
-    network = google_compute_network.vpc_externo.name
-    priority = 1000
-    direction = "INGRESS"
-    disabled = false
-    source_ranges = [ "192.168.0.0/16" ]
-    target_tags =  [ "north-south" ]
+#########################################################################
+# NORTH-SOUTH Traffic - including health checks
+resource "google_compute_firewall" "allow-nginx-vpc-externo" {
+    project       = module.host_project.name
+    name          = "allow-nva-hc-ingress"
+    direction     = "INGRESS"
+    network       = google_compute_network.vpc_externo.id
+    source_ranges = [ "0.0.0.0/0" ]
+    target_tags =  [ "nva-health-check" ]
     allow {
         protocol = "icmp"
     }
     allow {
         protocol = "tcp"
-        ports    = ["80"]
+        ports    = ["8081", "8082", "80" ]
+    }
+}
+resource "google_compute_firewall" "allow-nginx-shared-vpc" {
+    project       = module.host_project.name
+    name          = "allow-nginx"
+    direction     = "INGRESS"
+    network       = google_compute_network.vpc_shared.id
+    source_ranges = [ "0.0.0.0/0" ]
+    target_tags =  [ "nginx" ]
+    allow {
+        protocol = "icmp"
+    }
+    allow {
+        protocol = "tcp"
+        ports    = ["8081", "8082", "80" ]
     }
 }
 
+#########################################################################
+# health-checks NVAs ILB
+# shared VPC
 resource "google_compute_firewall" "allow-nva-hc-shared-vpc" {
     project       = module.host_project.name
     name          = "allow-nva-hc-shared-vpc"
-    provider      = google-beta
     direction     = "INGRESS"
     network       = google_compute_network.vpc_shared.id
-    source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
-    target_tags =  [ "fw" ]
+    source_ranges = [ "130.211.0.0/22", "35.191.0.0/16" ]
+    target_tags =  [ "nva-health-check" ]
     allow {
         protocol = "tcp"
-        ports    = ["80"]
+        ports    = [ "22" ]
     }
 }
-resource "google_compute_firewall" "allow-nva-hc-multi-tenant-vpc" {
+# external VPC
+resource "google_compute_firewall" "allow-nva-hc-external-vpc" {
     project       = module.host_project.name
-    name          = "allow-nva-hc-multi-tenant-vpc"
-    provider      = google-beta
+    name          = "allow-nva-hc-external-vpc"
     direction     = "INGRESS"
-    network       = google_compute_network.vpc_multi_tenant.id
-    source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
-    target_tags =  [ "fw" ]
+    network       = google_compute_network.vpc_externo.id
+    source_ranges = [ "130.211.0.0/22", "35.191.0.0/16" ]
+    target_tags =  [ "nva-health-check" ]
     allow {
         protocol = "tcp"
-        ports    = ["80"]
+        ports    = [ "22" ]
     }
 }
+# Multi-tenant
+# resource "google_compute_firewall" "allow-nva-hc-multi-tenant-vpc" {
+#     project       = module.host_project.name
+#     name          = "allow-nva-hc-multi-tenant-vpc"
+#     direction     = "INGRESS"
+#     network       = google_compute_network.vpc_multi_tenant.id
+#     source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
+#     target_tags =  [ "fw" ]
+#     allow {
+#         protocol = "tcp"
+#         ports    = ["22"]
+#     }
+# }
