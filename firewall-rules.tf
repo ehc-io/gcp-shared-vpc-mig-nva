@@ -72,75 +72,54 @@ resource "google_compute_firewall" "allow-east-west-single-tenant" {
 }
 #########################################################################
 # NORTH-SOUTH Traffic - including health checks
+########################################################################
+# External VPC 
 resource "google_compute_firewall" "allow-nginx-vpc-externo" {
     project       = module.host_project.name
     name          = "allow-nva-hc-ingress"
     direction     = "INGRESS"
     network       = google_compute_network.vpc_externo.id
     source_ranges = [ "0.0.0.0/0" ]
-    target_tags =  [ "nva-health-check" ]
+    target_tags =  [ "nginx", "nva-health-check" ]
     allow {
         protocol = "icmp"
     }
     allow {
         protocol = "tcp"
-        ports    = ["8081", "8082", "80" ]
+        ports    = ["8080", "8081", "8082", "80" ]
     }
 }
+# Shared VPC 
 resource "google_compute_firewall" "allow-nginx-shared-vpc" {
     project       = module.host_project.name
-    name          = "allow-nginx"
+    name          = "allow-nginx-shared-vpc"
     direction     = "INGRESS"
     network       = google_compute_network.vpc_shared.id
     source_ranges = [ "0.0.0.0/0" ]
-    target_tags =  [ "nginx" ]
+    target_tags =  [ "nginx" , "nva-health-check" ]
     allow {
         protocol = "icmp"
     }
     allow {
         protocol = "tcp"
-        ports    = ["8081", "8082", "80" ]
+        ports    = ["8080", "8081", "8082", "80" ]
     }
 }
-
-#########################################################################
-# health-checks NVAs ILB
-# shared VPC
-resource "google_compute_firewall" "allow-nva-hc-shared-vpc" {
+# Multi-Tenant VPC
+resource "google_compute_firewall" "allow-nginx-multi-tenant-vpc" {
     project       = module.host_project.name
-    name          = "allow-nva-hc-shared-vpc"
+    name          = "allow-nginx-multi-tenant-vpc"
     direction     = "INGRESS"
-    network       = google_compute_network.vpc_shared.id
-    source_ranges = [ "130.211.0.0/22", "35.191.0.0/16" ]
-    target_tags =  [ "nva-health-check" ]
+    network       = google_compute_network.vpc_multi_tenant.id
+    source_ranges = [ "0.0.0.0/0" ]
+    target_tags =  [ "nginx" , "nva-health-check" ]
+    allow {
+        protocol = "icmp"
+    }
     allow {
         protocol = "tcp"
-        ports    = [ "22" ]
+        ports    = ["8080", "8081", "8082", "80" ]
     }
 }
-# external VPC
-resource "google_compute_firewall" "allow-nva-hc-external-vpc" {
-    project       = module.host_project.name
-    name          = "allow-nva-hc-external-vpc"
-    direction     = "INGRESS"
-    network       = google_compute_network.vpc_externo.id
-    source_ranges = [ "130.211.0.0/22", "35.191.0.0/16" ]
-    target_tags =  [ "nva-health-check" ]
-    allow {
-        protocol = "tcp"
-        ports    = [ "22" ]
-    }
-}
-# Multi-tenant
-# resource "google_compute_firewall" "allow-nva-hc-multi-tenant-vpc" {
-#     project       = module.host_project.name
-#     name          = "allow-nva-hc-multi-tenant-vpc"
-#     direction     = "INGRESS"
-#     network       = google_compute_network.vpc_multi_tenant.id
-#     source_ranges = [ "130.211.0.0/22","35.191.0.0/16" ]
-#     target_tags =  [ "fw" ]
-#     allow {
-#         protocol = "tcp"
-#         ports    = ["22"]
-#     }
-# }
+# Single-Tenant VPC (TODO)
+# 
