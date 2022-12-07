@@ -1,4 +1,6 @@
+######################################################################
 # SSH Management
+######################################################################
 resource "google_compute_firewall" "allow-ssh-vpc-externo" {
     project = module.host_project.name
     description = "allows ssh connections from the internet to host on the external subnet (subnet-a)"
@@ -31,6 +33,7 @@ resource "google_compute_firewall" "allow-ssh-vpc-mgmt" {
 }
 ######################################################################
 # EAST-WEST Traffic
+######################################################################
 resource "google_compute_firewall" "allow-east-west-shared" {
     project = module.host_project.name
     name = "allow-east-west-shared"
