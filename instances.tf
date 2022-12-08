@@ -111,6 +111,7 @@ resource "google_compute_instance" "nginx-c" {
         curl -o /usr/share/nginx/html/index.html https://gist.githubusercontent.com/ehc-io/5248879e9aabbe4444e2ead09be754c0/raw/f4f15bf317f920a0982b0e29d87d66434cd57212/demo-index.html
         # web server-2 config
         host=$(hostname) ; echo "Webserver: $host" > /usr/share/nginx/html/txt.html
+        systemctl restart nginx.service
         EOT
     }
 
@@ -162,6 +163,7 @@ resource "google_compute_instance" "nginx-d" {
         curl -o /usr/share/nginx/html/index.html https://gist.githubusercontent.com/ehc-io/5248879e9aabbe4444e2ead09be754c0/raw/f4f15bf317f920a0982b0e29d87d66434cd57212/demo-index.html
         # web server-2 config
         host=$(hostname) ; echo "Webserver: $host" > /usr/share/nginx/html/txt.html
+        systemctl restart nginx.service
         EOT
     }
 
@@ -215,6 +217,7 @@ resource "google_compute_instance" "nginx-f" {
         curl -o /usr/share/nginx/html/index.html https://gist.githubusercontent.com/ehc-io/5248879e9aabbe4444e2ead09be754c0/raw/f4f15bf317f920a0982b0e29d87d66434cd57212/demo-index.html
         # web server-2 config
         host=$(hostname) ; echo "Webserver: $host" > /usr/share/nginx/html/txt.html
+        systemctl restart nginx.service
         EOT
     }
 
@@ -268,6 +271,7 @@ resource "google_compute_instance" "nginx-g" {
         curl -o /usr/share/nginx/html/index.html https://gist.githubusercontent.com/ehc-io/5248879e9aabbe4444e2ead09be754c0/raw/f4f15bf317f920a0982b0e29d87d66434cd57212/demo-index.html
         # web server-2 config
         host=$(hostname) ; echo "Webserver: $host" > /usr/share/nginx/html/txt.html
+        systemctl restart nginx.service
         EOT
     }
 
