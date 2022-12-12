@@ -304,34 +304,12 @@ resource "google_compute_region_health_check" "nva-mig-hc-egress" {
         port = "80"
     }
 }
-#########################################################################
-# ILBaNH subnet-H
-########################################################################
-# resource "google_compute_region_backend_service" "ilb-egress-bs-single-tenant-vpc" {
-#     project               = module.host_project.name
-#     name                  = "ilb-egress-bs-single-tenant-vpc"
-#     region                = var.region_1
-#     protocol              = "TCP"
-#     load_balancing_scheme = "INTERNAL"
-#     network               = google_compute_network.vpc_single_tenant.id
-#     health_checks         = [ google_compute_region_health_check.nva-mig-hc-egress.id ]
-#     backend {
-#         balancing_mode = "CONNECTION"
-#         group           = google_compute_instance_group_manager.mig-nva.instance_group
-#     }
-# }
-# # ILBaNH subnet-H forwarding rule
-# resource "google_compute_forwarding_rule" "ilb-egress-fr-single-tenant-vpc" {
-#     project         = module.host_project.name
-#     name                  = "ilb-egress-fr-single-tenant-vpc"
-#     backend_service       = google_compute_region_backend_service.ilb-egress-bs-single-tenant-vpc.id
-#     provider              = google-beta
-#     region                = var.region_1
-#     ip_protocol           = "TCP"
-#     load_balancing_scheme = "INTERNAL"
-#     all_ports             = true
-#     network               = google_compute_network.vpc_single_tenant.id
-#     subnetwork            = google_compute_subnetwork.subnet-i.id
-# }
-# ########################################################################
-# health check ILB EGRESS
+
+output "ilb-1" {
+    value = google_compute_global_address.external-ip-1
+  
+}
+output "ilb-2" {
+    value = google_compute_global_address.external-ip-2
+  
+}

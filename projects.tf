@@ -88,62 +88,6 @@ resource "google_compute_shared_vpc_service_project" "service_project_f" {
     module.host_project, module.service_project_f
     ]
 }
-#################################################################
-# service project service g
-module "service_project_g" {
-    source              = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v13.0.0"
-    name                =  "${var.service_project_g}-${var.timestamp}"
-    billing_account     = var.billing_account
-    parent              = google_folder.default.name
-    services = [
-    "compute.googleapis.com"
-    ]
-}
-
-resource "google_compute_shared_vpc_service_project" "service_project_g" {
-    host_project    = google_compute_shared_vpc_host_project.host_project.project
-    service_project = module.service_project_g.name
-    depends_on = [
-    module.host_project, module.service_project_g
-    ]
-}
-################################################################
-# service project service i
-module "service_project_i" {
-    source              = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v13.0.0"
-    name                =  "${var.service_project_i}-${var.timestamp}"
-    billing_account     = var.billing_account
-    parent              = google_folder.default.name
-    services = [
-    "compute.googleapis.com"
-    ]
-}
-
-resource "google_compute_shared_vpc_service_project" "service_project_i" {
-    host_project    = google_compute_shared_vpc_host_project.host_project.project
-    service_project = module.service_project_i.name
-    depends_on = [
-    module.host_project, module.service_project_i
-    ]
-}
-###############################################################
-# service project service j
-module "service_project_j" {
-    source              = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v13.0.0"
-    name                =  "${var.service_project_j}-${var.timestamp}"
-    billing_account     = var.billing_account
-    parent              = google_folder.default.name
-    services = [
-    "compute.googleapis.com"
-    ]
-}
-resource "google_compute_shared_vpc_service_project" "service_project_j" {
-    host_project    = google_compute_shared_vpc_host_project.host_project.project
-    service_project = module.service_project_j.name
-    depends_on = [
-    module.host_project, module.service_project_j
-    ]
-}
 
 output "tld_folder" {
     value = google_folder.default
